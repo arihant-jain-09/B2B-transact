@@ -5,7 +5,7 @@ require('./models/User');
 require('./models/Company');
 require('./models/Invoice');
 
-mongoose.connect(keys.mongoURI,{},(err)=>{
+mongoose.connect('mongodb+srv://arihant_jain_09:8CcQPrAtA8BfMjnN@transact.izaa0.mongodb.net/B2B?retryWrites=true&w=majority',{},(err)=>{
   if(err){
     console.log(err);
   }
