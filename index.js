@@ -5,13 +5,13 @@ require('./models/User');
 require('./models/Company');
 require('./models/Invoice');
 
-// mongoose.connect(keys.mongoURI,{},(err)=>{
-//   if(err){
-//     console.log(err);
-//   }
-//   else console.log('connected to mongodb');
-// })
-// console.log(mongoose.connection.readyState);
+mongoose.connect(keys.mongoURI,{},(err)=>{
+  if(err){
+    console.log(err);
+  }
+  else console.log('connected to mongodb');
+})
+console.log(mongoose.connection.readyState);
 const app=express();
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
