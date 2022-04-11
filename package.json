@@ -6,8 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\"",
     "start":"node index.js",
-    "server": "nodemon index.js",
-    "postinstall": "NPM_CONFIG_PRODUCTION=false"
+    "server": "nodemon index.js"
   },
   "keywords": [],
   "author": "",
