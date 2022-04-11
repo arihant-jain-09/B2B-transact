@@ -52,5 +52,5 @@ jobs:
         with:
           app-name: 'B2Btransact'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_E2AF839CE1254FEF807151B80A2B646E }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_799751082C774F43B17CD804E1A4FAFC }}
           package: .
