@@ -1,6 +1,5 @@
 const express=require('express');
 const mongoose=require('mongoose');
-const cookieSession=require('cookie-session');
 const keys=require('./config/keys');
 require('./models/User');
 require('./models/Company');
@@ -21,11 +20,6 @@ mongoose.connect(keys.mongoURI,{},(err)=>{
 })
 console.log(mongoose.connection.readyState);
 const app=express();
-app.use(cookieSession({
-    maxAge:30 * 24 * 60 * 60 *1000,
-    keys: [keys.cookieKey],
-}))
-
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 require('./routes/User/authRoutes')(app);
