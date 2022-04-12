@@ -1,10 +1,17 @@
+@import './styles/variables';
+
 *,*::before,*::after{
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
+html{
+  font-size: 10px;
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: -apple-system, BlinkMacSystemFont,'Gordita Regular','Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -19,4 +26,32 @@ code {
 @font-face {
   font-family: 'Acumin Pro Black';
   src: local('Acumin Pro Black'), url(./fonts/AcuminProBlack.otf) format('otf');
+}
+
+@font-face {
+  font-family: 'Gordita Regular';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Gordita Regular'), url(./fonts/GorditaRegular.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'Gordita Medium';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Gordita Medium'), url(./fonts/GorditaMedium.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'Gordita Bold';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Gordita Bold'), url(./fonts/GorditaBold.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'Gordita Black';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Gordita Black'), url(./fonts/GorditaBlack.woff) format('woff');
 }

@@ -1,0 +1,43 @@
+//Typography
+
+@mixin Gordita-Regular {
+  font-family: 'Gordita Regular', sans-serif;
+}
+@mixin Gordita-Medium {
+  font-family: 'Gordita Medium', sans-serif;
+}
+@mixin Gordita-Bold {
+  font-family: 'Gordita Bold', sans-serif;
+}
+@mixin Gordita-Black {
+  font-family: 'Gordita Gordita Black', sans-serif;
+}
+//Default Padding of Pages like AboutMe
+@mixin DefaultPaddComponent {
+  padding: 5rem 0;
+}
+
+//Flex
+@mixin FlexCenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+//Grid
+@mixin Grid {
+  display: grid;
+  grid-template-columns:
+    [full-start] minmax(6rem, 1fr)
+    [content-start] repeat(12, [col-start] minmax(min-content, 10rem) [col-end])
+    [content-end]
+    minmax(6rem, 1fr) [full-end];
+  grid-auto-rows: min-content;
+  @media screen and (max-width: 960px) {
+    grid-template-columns:
+      [full-start content-start] repeat(
+        12,
+        [col-start] minmax(min-content, 10rem) [col-end]
+      )
+      [content-end full-end];
+  }
+}

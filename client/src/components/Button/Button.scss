@@ -1,0 +1,17 @@
+@import '../../styles/mixins';
+@import '../../styles/variables';
+.button{
+  width: 15rem;
+  @include FlexCenter;
+  background-color: $dark-color;
+  padding: .75rem 1rem;
+  border-radius: $border-radius;
+  transition: background-color .5s;
+  cursor: pointer;
+  &__text{
+    color: $bg;
+  }
+  &:hover{
+    background-color: $hover-color;
+  }
+}

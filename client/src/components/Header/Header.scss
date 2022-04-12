@@ -1,0 +1,48 @@
+@import '../../styles/variables';
+.header{
+  grid-column: full-start / full-end;
+  height: 7rem;
+  display: flex;
+  align-items: center;
+  &__items{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    &-left{
+      @include Gordita-Bold;
+      font-size: 2.5rem;
+      &--logo{
+        a:where(:link,:visited,:hover){
+          text-decoration: none;
+          color: inherit;
+        }
+      }
+    }
+    &-middle{
+      flex: 0 50%;
+      display: flex;
+      justify-content: space-between;
+      &--item{
+        a:where(:link,:visited,:hover){
+          text-decoration: none;
+          color: inherit;
+        }
+
+        cursor: pointer;
+        color: $text-light;
+        transition: color .5s;
+        &:hover{
+          color: $dark-color;
+        }
+      }
+    }
+    &-right{
+      &--button{
+        a:where(:link,:visited,:hover){
+          text-decoration: none;
+          color: inherit;
+        }
+      }
+    }
+  }
+}
