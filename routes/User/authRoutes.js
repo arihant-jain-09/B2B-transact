@@ -7,7 +7,10 @@ module.exports=(app)=>{
         app.patch('/users/:id',(req,res)=>{
             const user_id=req.params.id;
             const {trxId,amount} = req.body;
-            if (!mongoose.Types.ObjectId.isValid(trxId)) {
+            if (!mongoose.Types.ObjectId.isValid(user_id)) {
+                return res.status(400).send("Invalid user Id");
+            }
+            else if (!mongoose.Types.ObjectId.isValid(trxId)) {
                     return res.status(400).send("Invalid trx Id");
             }
             if(trxId && amount){

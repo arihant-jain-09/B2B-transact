@@ -6,7 +6,7 @@ const companySchema=new mongoose.Schema({
         type:String,
         required:true,
     },
-    users:[{id:{type: mongoose.Schema.Types.ObjectId, ref: 'User'}}],
+    users:[{_id:{type: mongoose.Schema.Types.ObjectId}}],
     invoices:[invoiceSchema],
     createdAt:Date
     

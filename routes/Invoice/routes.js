@@ -8,6 +8,12 @@ module.exports=(app)=>{
         app.patch('/invoices/:id',(req,res)=>{
           const invoice_id=req.params.id;
           const {status}=req.body;
+          if (!mongoose.Types.ObjectId.isValid(invoice_id)) {
+            return res.status(400).send("Invalid Invoice Id");
+          }
+          if(status!=='pending' || status !== 'approved')
+            return res.status(400).send("Enter a valid status")
+
           Invoice.findByIdAndUpdate(invoice_id,{status})
             .then((response)=>{
               res.send("changed status")
@@ -49,7 +55,6 @@ module.exports=(app)=>{
               });
               try {
                   await invoice.save();
-                  // res.send(`${`invoice created with transaction Id:`}${invoice.id} sender being ${sender.company_name} and receiver is ${receiver.company_name} and the user who begin the transaction is ${user.name}`)
               } catch (error) {
                   res.status(404).send(error.message);
               }
@@ -65,6 +70,14 @@ module.exports=(app)=>{
                   .then(([ senderCompany, receiverCompany])=>{
                     // console.log(senderCompany);
                     // console.log(receiverCompany);
+                    res.send({
+                      'transactionId':invoice.id,
+                      'companies':{
+                        'sender':sender.company_name,
+                        'receiver':receiver.company_name
+                      },
+                      'transacted By':user.name
+                    })
                   })
                   .catch((err)=>{
                     res.send(err.message);
@@ -73,14 +86,6 @@ module.exports=(app)=>{
               } catch (error) {
                 res.send(err.message);
               }
-              res.send({
-                'transactionId':invoice.id,
-                'companies':{
-                  'sender':sender.company_name,
-                  'receiver':receiver.company_name
-                },
-                'transacted By':user.name
-              })
             }
             else if(sender && user){
               res.send('message: receiver does not exits in our database')
