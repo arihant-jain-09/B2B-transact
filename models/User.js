@@ -8,7 +8,7 @@ const userSchema=new mongoose.Schema({
         type:String,
         required:true
     },
-    _companyId:{type:mongoose.Schema.Types.ObjectId,ref:'company'},
+    _company:{_id:{type: mongoose.Schema.Types.ObjectId},company_name:String},
     createdAt:Date
     
 })

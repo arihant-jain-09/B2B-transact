@@ -11,16 +11,15 @@ const updateCompanyName=(company_id,company_name,callback)=>{
 }
 
 //Function to add a user to company
-const addUserToCompany=(user,company_id,callback)=>{
-  const objUserId=user._id;
-  Company.exists({users:{ $elemMatch: {_id:objUserId} }}).then((result)=>{
+const addUserToCompany=(user,company_id,company_name,callback)=>{
+  Company.exists({users:{ $elemMatch: {_id:user._id} }}).then((result)=>{
     if(result) return callback("user already exists in company");
     else{
       Promise.all([
         Company.updateOne({_id:company_id},{$push: {
-          users:{_id:objUserId}
+          users:{_id:user._id,name:user.name}
         }}),
-        User.updateOne({_id:user._id},{_companyId:company_id})
+        User.updateOne({_id:user._id},{_company:{_id:company_id,name:company_name}})
       ]).then(([comp,user])=>{
         if(comp.modifiedCount ===1 && user.modifiedCount===1)
           return callback("added user and changed name of company")
@@ -51,10 +50,10 @@ module.exports=(app)=>{
           //For adding user to a company
           if(user_id && company_name){
             User.findOne({_id:user_id}).then((user)=>{
-              Company.findOne({"company_name":company_name}).then((response)=>{
+              Company.findOne({_id:company_id}).then((response)=>{
                 if(user && response){
                   Promise.all([
-                    addUserToCompany(user,company_id,function(result) {
+                    addUserToCompany(user,company_id,company_name,function(result) {
                       console.log(result);
                     }),
                     updateCompanyName(company_id,company_name,function(result){
@@ -84,7 +83,7 @@ module.exports=(app)=>{
           }
           //For changing name of the company
           else if(company_name){
-            return updateCompanyName(company_id,company_name,res,function(result){
+            return updateCompanyName(company_id,company_name,function(result){
               res.send(result);
             })
           }

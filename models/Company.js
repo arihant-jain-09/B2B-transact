@@ -6,8 +6,8 @@ const companySchema=new mongoose.Schema({
         type:String,
         required:true,
     },
-    users:[{_id:{type: mongoose.Schema.Types.ObjectId}}],
-    invoices:[invoiceSchema],
+    users:[{_id:{type: mongoose.Schema.Types.ObjectId},name:String}],
+    invoices:[{_id:{type: mongoose.Schema.Types.ObjectId}}],
     createdAt:Date
     
 })

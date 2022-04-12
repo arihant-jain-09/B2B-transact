@@ -7,9 +7,9 @@ const InvoiceSchema=new mongoose.Schema({
     status:{
         type:String
     },   
-    _sentBy:{type:mongoose.Schema.Types.ObjectId,ref:'Company', required:true},
-    _receivedBy:{type:mongoose.Schema.Types.ObjectId,ref:'Company', required:true},
-    _UserId:{type:mongoose.Schema.Types.ObjectId,ref:'User', required:true},
+    _sentBy:{_id:{type: mongoose.Schema.Types.ObjectId},company_name:String},
+    _receivedBy:{_id:{type: mongoose.Schema.Types.ObjectId},company_name:String},
+    _UserId:{_id:{type: mongoose.Schema.Types.ObjectId},name:String},
     createdAt:Date
 })
 mongoose.model('invoices',InvoiceSchema);

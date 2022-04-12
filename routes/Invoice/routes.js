@@ -11,14 +11,15 @@ module.exports=(app)=>{
           if (!mongoose.Types.ObjectId.isValid(invoice_id)) {
             return res.status(400).send("Invalid Invoice Id");
           }
-          if(status!=='pending' || status !== 'approved')
-            return res.status(400).send("Enter a valid status")
-
-          Invoice.findByIdAndUpdate(invoice_id,{status})
+          if(status==='pending' || status === 'approved')
+            Invoice.findByIdAndUpdate(invoice_id,{status})
             .then((response)=>{
               res.send("changed status")
             })
             .catch((err)=>res.send(err.message))
+
+          else 
+            return res.status(400).send("Enter a valid status")
           // Invoice.findOne({_id:invoice_id}).then((results)=>{
           //   if(results){
           //     Invoice.updateOne({_id:invoice_id},{status}).then((result)=>{
@@ -61,10 +62,10 @@ module.exports=(app)=>{
               try {
                 Promise.all([
                   Company.updateOne({_id:sender._id},{$push: {
-                    invoices:{id:invoice._id}
+                    invoices:{_id:invoice._id}
                   }}),
                   Company.updateOne({_id:receiver._id},{$push: {
-                    invoices:{id:invoice._id}
+                    invoices:{_id:invoice._id}
                   }}),
                   ])
                   .then(([ senderCompany, receiverCompany])=>{
