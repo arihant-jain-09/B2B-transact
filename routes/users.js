@@ -1,52 +1,59 @@
 const GET="SELECT * FROM users";
+const GET_INVOICES="SELECT invoice_id,grand_total,buyer_id,seller_id,status,created_at FROM invoice";
 const INSERT_USER="INSERT INTO users(name,username) VALUES";
-const INSERT_EMPLOYEE="INSERT INTO employee(user_id,company_id) VALUES";
+const INSERT_EMPLOYEE="INSERT INTO employee(user_id,company_id,email) VALUES";
 
 const db=require('../sql/connect');
 module.exports=(app)=>{
 
     const updateUser=(name,username,user_id,callback)=>{
       if(username===null){
-        const updateUser=`UPDATE users SET name = '${name}' WHERE user_id = ${user_id}`;
-          db.query(updateUser,(err,results)=>{
+        const updateUserQuery=`UPDATE users SET name = '${name}' WHERE user_id = ${user_id}`;
+          db.query(updateUserQuery,(err,results)=>{
             if(err) return callback(err);
               return callback({"message":"changed user properties"})
           })
       }
       else if(name===null){
-        const updateUser=`UPDATE users SET username = '${username}' WHERE user_id = ${user_id}`;
-          db.query(updateUser,(err,results)=>{
+        const updateUserQuery=`UPDATE users SET username = '${username}' WHERE user_id = ${user_id}`;
+          db.query(updateUserQuery,(err,results)=>{
             if(err) return callback(err);
               return callback({"message":"changed user properties"})
           })
       }
       else{
-        const updateUser=`UPDATE users SET username = '${username}' , name = '${name}' WHERE user_id = ${user_id}`;
-          db.query(updateUser,(err,results)=>{
+        const updateUserQuery=`UPDATE users SET username = '${username}' , name = '${name}' WHERE user_id = ${user_id}`;
+          db.query(updateUserQuery,(err,results)=>{
             if(err) return callback(err);
               return callback({"message":"changed user properties"})
           })
       }
       }
 
-    const insertEmployee=(user_id,company_id,callback)=>{
+    const insertEmployee=(user_id,company_id,email,callback)=>{
       const check_employee=`SELECT 1 FROM employee WHERE user_id='${user_id}' LIMIT 1`
         db.query(check_employee,(err,results)=>{
           if(err) return callback(err);
           else if(results.rowCount==1)
             return callback({"message":"employee already exists"})
           else
-            db.query(`${INSERT_EMPLOYEE} ('${user_id}','${company_id}')`,(err,results)=>{
+            db.query(`${INSERT_EMPLOYEE} ('${user_id}','${company_id}','${email}')`,(err,results)=>{
             if(err) return callback(err)
             return callback({"message":"Added employee"});
           })
+        
         })
     }
 
     app.patch('/users/:id',(req,res)=>{
-      const {username,name,company_id}=req.body;
+      const {username,name,company_id,email}=req.body;
       const user_id=req.params.id;
-      if(username && name && company_id){
+      if(company_id && email==null)
+        return res.send({"message":"please enter email for employee"});
+      else if(email && company_id==null)
+        return res.send({"message":"please enter company_id for employee"})
+
+      else if(username && name && company_id && email){
         const query=`SELECT 1 FROM users WHERE user_id='${user_id}' LIMIT 1;`;
         db.query(query,(err,results)=>{
           if(err) res.send(err.message)
@@ -55,7 +62,7 @@ module.exports=(app)=>{
             db.query(check_company,(err,results)=>{
               if(err) res.send(err.message)
               else if(results.rowCount==1){
-                insertEmployee(user_id,company_id,function (employeeAddMessage) {
+                insertEmployee(user_id,company_id,email,function (employeeAddMessage) {
                   updateUser(name,username,user_id,function(userMessage) {
                     res.send({...userMessage,employeeAddMessage});
                   })
@@ -79,12 +86,12 @@ module.exports=(app)=>{
           else res.send({"message":"please enter a valid user id"})
         })
       }
-      else if(name && company_id){
+      else if(name && company_id && email){
         const check_company=`SELECT 1 FROM company WHERE company_id='${company_id}' LIMIT 1`
             db.query(check_company,(err,results)=>{
               if(err) res.send(err.message)
               else if(results.rowCount==1){
-                insertEmployee(user_id,company_id,function (employeeAddMessage) {
+                insertEmployee(user_id,company_id,email,function (employeeAddMessage) {
                   updateUser(name,null,user_id,function(userMessage) {
                     res.send({...userMessage,employeeAddMessage});
                   })
@@ -93,12 +100,12 @@ module.exports=(app)=>{
               else res.send({"message":"please enter a valid company id"})
             })
       }
-      else if(username && company_id){
+      else if(username && company_id && email){
         const check_company=`SELECT 1 FROM company WHERE company_id='${company_id}' LIMIT 1`
             db.query(check_company,(err,results)=>{
               if(err) res.send(err.message)
               else if(results.rowCount==1){
-                insertEmployee(user_id,company_id,function (employeeAddMessage) {
+                insertEmployee(user_id,company_id,email,function (employeeAddMessage) {
                   updateUser(null,username,user_id,function(userMessage) {
                     res.send({...userMessage,employeeAddMessage});
                   })
@@ -117,12 +124,12 @@ module.exports=(app)=>{
           res.send({...userMessage});
         })
       }
-      else if(company_id){
+      else if(company_id && email){
         const check_company=`SELECT 1 FROM company WHERE company_id='${company_id}' LIMIT 1`
             db.query(check_company,(err,results)=>{
               if(err) res.send(err.message)
               else if(results.rowCount==1){
-                insertEmployee(user_id,company_id,function (employeeAddMessage) {
+                insertEmployee(user_id,company_id,email,function (employeeAddMessage) {
                   res.send(employeeAddMessage)
                 })
               }
@@ -136,6 +143,22 @@ module.exports=(app)=>{
     app.get('/users',(req,res)=>{
       db.query(GET,(err,results)=>{
         res.send(results.rows);
+      })
+    })
+
+    app.get('/users/:id/invoices',(req,res)=>{
+      const user_id=req.params.id;
+      const check_user=`SELECT 1 FROM users WHERE user_id='${user_id}' LIMIT 1`;
+      db.query(check_user,(err,results)=>{
+        if(err) return res.send(err);
+        else if(results && results.rowCount==1){
+          db.query(GET_INVOICES,(err,results)=>{
+            if(err) return res.send(err);
+            else if(results && results.rows)
+              return res.send(results.rows);
+          })
+        }
+        else return res.send({"message":"use a valid user id in url params"});
       })
     })
 

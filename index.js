@@ -7,6 +7,9 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 require('./routes/users')(app);
 require('./routes/company')(app);
+require('./routes/employee')(app);
+require('./routes/invoice')(app);
+require('./routes/product')(app);
 // Create table
 app.post("/addtable", async(req, res) => {
   const {sqlQuery}=req.body;

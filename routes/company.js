@@ -60,13 +60,13 @@ module.exports=(app)=>{
       const {company_name,email,established}=req.body;
       const query=`SELECT 1 FROM company WHERE company_name='${company_name}' OR email='${email}' LIMIT 1`;
       db.query(query,(err,results)=>{
-        if(err) res.send(err.message);
-        if(results.rowCount==1)
-          res.send({"message":"company with either same name or email already exists please choose different values"});  
+        if(err) return res.send(err.message);
+        if(results && results?.rowCount==1)
+          return res.send({"message":"company with either same name or email already exists please choose different values"});  
         else{
           db.query(`${INSERT}('${company_name}','${email}','${established}')`,(err,results)=>{
-            if(err) res.send(err.message);
-            res.send(results);
+            if(err) return res.send(err.message);
+            return res.send(results);
           })
         }
       })
