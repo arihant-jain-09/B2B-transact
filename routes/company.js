@@ -52,7 +52,7 @@ module.exports=(app)=>{
     app.get('/companies',(req,res)=>{
         db.query(GET,(err,results)=>{
         if(err) res.send(err.message)
-        res.send(results);
+        res.send(results.rows);
       })
     })
 
