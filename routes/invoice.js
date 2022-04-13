@@ -1,6 +1,6 @@
 const GET="SELECT * FROM invoice";
 // const INSERT_USER="INSERT INTO invoices(name,username) VALUES";
-const ADD_INVOICE="INSERT INTO invoice(buyer_id,seller_id,employee_id,grand_total ) VALUES";
+const ADD_INVOICE="INSERT INTO invoice(buyer_id,seller_id,employee_id,products_services,grand_total ) VALUES";
 
 const db=require('../sql/connect');
 
@@ -8,7 +8,7 @@ module.exports=(app)=>{
 
   const updateInvoice=(grand_total,invoice_id,status,callback)=>{
     let query;
-    if(status && (status!=='pending' || status!=='approved')) return callback({"message":"please enter a status of pending and approved only"})
+    if(status && (status!=='pending' || status!=='approved' || status!=='denied')) return callback({"message":"please enter a status of pending and approved only"})
     else if(status && grand_total){
       query=`UPDATE invoice SET grand_total = '${grand_total}' WHERE invoice_id = ${invoice_id}`
     }
@@ -59,41 +59,57 @@ module.exports=(app)=>{
   })
 
   app.post('/invoices',(req,res)=>{
-    const {seller_id,buyer_id,employee_id,grand_total} = req.body;
-    if(!seller_id || !buyer_id || !employee_id || !grand_total)
+    const {seller_id,buyer_id,employee_id,sku,grand_total} = req.body;
+    if(!seller_id || !buyer_id || !employee_id || !grand_total || !sku)
       return res.send({"message":"please enter all valid body params"})
     if(grand_total<=0) return res.send({"message":"please enter grand_total > 0"})
     else{
       const check_sender=`SELECT company_name FROM company WHERE company_id='${seller_id}' LIMIT 1`
       const check_receiver=`SELECT company_name FROM company WHERE company_id='${buyer_id}' LIMIT 1`
       const check_employee=`SELECT 1 FROM employee WHERE employee_id='${employee_id}' LIMIT 1`
+      const check_product=`SELECT sku FROM product WHERE sku='${sku}' LIMIT 1`
       try {
         Promise.all([
           db.query(check_sender),
           db.query(check_receiver),
           db.query(check_employee),
-        ]).then(([sender,receiver,employee])=>{
+          db.query(check_product),
+        ]).then(([sender,receiver,employee,product])=>{
             // return res.send({sender,receiver,employee})
-          if(sender.rowCount==1 && receiver.rowCount==1 && employee.rowCount==1){
-            db.query(`${ADD_INVOICE}('${buyer_id}','${seller_id}','${employee_id}','${grand_total}')`,(err,results)=>{
+          if(sender.rowCount==1 && receiver.rowCount==1 && employee.rowCount==1 && product.rowCount==1){
+            db.query(`${ADD_INVOICE}('${buyer_id}','${seller_id}','${employee_id}','${product.rows[0].sku}','${grand_total}')`,(err,results)=>{
               if(err) return res.send(err);
-              return res.send(`{"message":"added invoice" with buyer being ${sender.rows[0].company_name}, sender being ${receiver.rows[0].company_name} and employee id ${employee_id}`)
+              return res.send({"message":{
+                "buyer_id":buyer_id,
+                "seller_id":seller_id,
+                "products_services":product.rows[0].sku,
+                "employee_id":employee_id,
+                "grand_total":grand_total
+              }})
             })
           }
-          else if(sender.rowCount==1 && receiver.rowCount==1)
-            return res.send({"message":"please enter a valid employee id"})
-          else if(sender.rowCount==1 && employee.rowCount==1)
-            return res.send({"message":"please enter a valid receiver company id"})
-          else if(receiver.rowCount==1 && employee.rowCount==1)
-            return res.send({"message":"please enter a valid sender company id"})
-          else if(sender.rowCount==1)
-            return res.send({"message":"please enter a valid receiver and employee id's"})
-          else if(receiver.rowCount==1)
-            return res.send({"message":"please enter a valid sender and employee id's"})
-          else if(employee.rowCount==1)
-            return res.send({"message":"please enter a valid sender and receiver id's"})
+          // else if(sender.rowCount==1 && receiver.rowCount==1 && product.rowCount==1)
+          //   return res.send({"message":"please enter a valid employee id"})
+          // else if(sender.rowCount==1 && employee.rowCount==1 && product.rowCount==1)
+          //   return res.send({"message":"please enter a valid receiver id"})
+          // else if(sender.rowCount==1 && employee.rowCount==1 && receiver.rowCount==1)
+          //   return res.send({"message":"please enter a valid product id"})
+          // else if(sender.rowCount==1 && employee.rowCount==1 && receiver.rowCount==1)
+          //   return res.send({"message":"please enter a valid product id"})
+          // else if(sender.rowCount==1 && receiver.rowCount==1)
+          //   return res.send({"message":"please enter a valid employee id"})
+          // else if(sender.rowCount==1 && employee.rowCount==1)
+          //   return res.send({"message":"please enter a valid receiver company id"})
+          // else if(receiver.rowCount==1 && employee.rowCount==1)
+          //   return res.send({"message":"please enter a valid sender company id"})
+          // else if(sender.rowCount==1)
+          //   return res.send({"message":"please enter a valid receiver and employee id's"})
+          // else if(receiver.rowCount==1)
+          //   return res.send({"message":"please enter a valid sender and employee id's"})
+          // else if(employee.rowCount==1)
+          //   return res.send({"message":"please enter a valid sender and receiver id's"})
           else
-            return res.send({"message":"please enter a valid sender, receiver and employee id's"})
+            return res.send({"message":"please enter a valid sender, receiver, product and employee id's"})
         })
       } catch (error) {
         return res.send(error);
