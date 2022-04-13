@@ -1,24 +1,24 @@
 const express=require('express');
 const createTable=require('./sql/create');
-
-
+// const pool=require('./sql/pool');
+const db=require('./sql/connect');
 const app=express();
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
-const db=require('./sql/connect');
 require('./routes/users')(app);
 require('./routes/company')(app);
-
 // Create table
-app.post("/addtable", (req, res) => {
+app.post("/addtable", async(req, res) => {
   const {sqlQuery}=req.body;
   console.log(sqlQuery);
-  db.query(sqlQuery, (err) => {
-    if (err) {
-      throw err;
-    }
-    res.send("table created");
-  });
+  try {
+    const results=await db.query(sqlQuery);
+    res.json(results);
+  } catch (error) {
+    console.log(error);
+    res.send(error)
+  }
+  
 });
 
 // require('./routes/User/authRoutes')(app);

@@ -1,4 +1,4 @@
-exports.createUserTable= "CREATE TABLE users(user_id SERIAL PRIMARY KEY,name VARCHAR(250) NOT NULL,username VARCHAR(50) UNIQUE NOT NULL,created_on TIMESTAMP NOT NULL)";
+exports.createUserTable= "CREATE TABLE users(user_id SERIAL PRIMARY KEY,name VARCHAR(250) NOT NULL,username VARCHAR(50) UNIQUE NOT NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
 exports.createCompanyTable="CREATE TABLE company(company_id SERIAL PRIMARY KEY,company_name VARCHAR(500) NOT NULL UNIQUE,email VARCHAR(250) UNIQUE NOT NULL,established SMALLINT NOT NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
 exports.createEmployeeTable="CREATE TABLE employee(employee_id SERIAL PRIMARY KEY,user_id INTEGER REFERENCES users(user_id),company_id INTEGER REFERENCES company(company_id),created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
 exports.createInvoiceTable="CREATE TABLE invoice(invoice_id SERIAL PRIMARY KEY,employee_id INTEGER REFERENCES employee(employee_id),grand_total INTEGER NOT NULL,buyer_id INTEGER REFERENCES company(company_id),seller_id INTEGER REFERENCES company(company_id),	status VARCHAR(10) DEFAULT 'pending');";

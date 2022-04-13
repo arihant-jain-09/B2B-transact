@@ -20,8 +20,11 @@
   "license": "ISC",
   "dependencies": {
     "concurrently": "^7.1.0",
+    "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "mongoose": "^6.2.10",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "pg": "^8.7.3",
+    "tedious": "^14.4.0"
   }
 }
