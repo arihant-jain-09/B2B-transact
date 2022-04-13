@@ -6,12 +6,29 @@ const db=require('../sql/connect');
 module.exports=(app)=>{
 
     const updateUser=(name,username,user_id,callback)=>{
-      const updateUser=`UPDATE users SET username = "${username}" , name = "${name}" WHERE user_id = ${user_id}`;
+      if(username===null){
+        const updateUser=`UPDATE users SET name = "${name}" WHERE user_id = ${user_id}`;
           db.query(updateUser,(err,results)=>{
             if(err) return callback(err);
               return callback({"message":"changed user properties"})
           })
       }
+      else if(name===null){
+        const updateUser=`UPDATE users SET username = "${username}" WHERE user_id = ${user_id}`;
+          db.query(updateUser,(err,results)=>{
+            if(err) return callback(err);
+              return callback({"message":"changed user properties"})
+          })
+      }
+      else{
+        const updateUser=`UPDATE users SET username = "${username}" , name = "${name}" WHERE user_id = ${user_id}`;
+          db.query(updateUser,(err,results)=>{
+            if(err) return callback(err);
+              return callback({"message":"changed user properties"})
+          })
+      }
+      }
+
     const insertEmployee=(user_id,company_id,callback)=>{
       const check_employee=`SELECT 1 FROM employee WHERE user_id="${user_id}" LIMIT 1`
         db.query(check_employee,(err,results)=>{
@@ -50,7 +67,72 @@ module.exports=(app)=>{
           else res.send({"message":"please enter a valid user id"})
         })
       }
+      else if(username && name){
+        const query=`SELECT 1 FROM users WHERE user_id="${user_id}" LIMIT 1;`;
+        db.query(query,(err,results)=>{
+          if(err) res.send(err.message)
+          else if(results?.length>0 && results[0]['1']){
+            updateUser(name,username,user_id,function(userMessage) {
+              res.send(userMessage);
+            })
+          }
+          else res.send({"message":"please enter a valid user id"})
+        })
+      }
+      else if(name && company_id){
+        const check_company=`SELECT 1 FROM company WHERE company_id="${company_id}" LIMIT 1`
+            db.query(check_company,(err,results)=>{
+              if(err) res.send(err.message)
+              else if(results?.length>0 && results[0]['1']){
+                insertEmployee(user_id,company_id,function (employeeAddMessage) {
+                  updateUser(name,null,user_id,function(userMessage) {
+                    res.send({...userMessage,employeeAddMessage});
+                  })
+                })
+              }
+              else res.send({"message":"please enter a valid company id"})
+            })
+      }
+      else if(username && company_id){
+        const check_company=`SELECT 1 FROM company WHERE company_id="${company_id}" LIMIT 1`
+            db.query(check_company,(err,results)=>{
+              if(err) res.send(err.message)
+              else if(results?.length>0 && results[0]['1']){
+                insertEmployee(user_id,company_id,function (employeeAddMessage) {
+                  updateUser(null,username,user_id,function(userMessage) {
+                    res.send({...userMessage,employeeAddMessage});
+                  })
+                })
+              }
+              else res.send({"message":"please enter a valid company id"})
+            })
+      }
+      else if(username){
+        updateUser(null,username,user_id,function(userMessage) {
+          res.send({...userMessage});
+        })
+      }
+      else if(name){
+        updateUser(name,null,user_id,function(userMessage) {
+          res.send({...userMessage});
+        })
+      }
+      else if(company_id){
+        const check_company=`SELECT 1 FROM company WHERE company_id="${company_id}" LIMIT 1`
+            db.query(check_company,(err,results)=>{
+              if(err) res.send(err.message)
+              else if(results?.length>0 && results[0]['1']){
+                insertEmployee(user_id,company_id,function (employeeAddMessage) {
+                  res.send(employeeAddMessage)
+                })
+              }
+              else res.send({"message":"please enter a valid company id"})
+            })
+      }
+      else res.send({"message":"enter valid body params"})
     })
+
+    
     app.get('/users',(req,res)=>{
       db.query(GET,(err,results)=>{
         console.log(err);
