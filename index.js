@@ -1,23 +1,29 @@
 const express=require('express');
-const mongoose=require('mongoose');
-const keys=require('./config/keys');
-require('./models/User');
-require('./models/Company');
-require('./models/Invoice');
+const createTable=require('./sql/create');
 
-mongoose.connect('mongodb+srv://arihant_jain_09:8CcQPrAtA8BfMjnN@transact.izaa0.mongodb.net/B2B?retryWrites=true&w=majority',{},(err)=>{
-  if(err){
-    console.log(err);
-  }
-  else console.log('connected to mongodb');
-})
-console.log(mongoose.connection.readyState);
+
 const app=express();
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
-require('./routes/User/authRoutes')(app);
-require('./routes/Company/authRoutes')(app);
-require('./routes/Invoice/routes')(app);
+const db=require('./sql/connect');
+require('./routes/users')(app);
+require('./routes/company')(app);
+
+// Create table
+app.post("/addtable", (req, res) => {
+  const {sqlQuery}=req.body;
+  console.log(sqlQuery);
+  db.query(sqlQuery, (err) => {
+    if (err) {
+      throw err;
+    }
+    res.send("table created");
+  });
+});
+
+// require('./routes/User/authRoutes')(app);
+// require('./routes/Company/authRoutes')(app);
+// require('./routes/Invoice/routes')(app);
 
 if(process.env.NODE_ENV ==='production'){
   app.use(express.static('client/build'));
