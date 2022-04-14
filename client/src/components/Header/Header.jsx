@@ -14,13 +14,19 @@ const Header = () => {
           </div>
           <div className="header__items-middle">
             <div className="header__items-middle--item header-font">
-              <Link to='/companies'>Companies</Link>
+              <a href='/companies' target="_blank" >Companies</a>
             </div>
             <div className="header__items-middle--item header-font">
-              <Link to='/users'>Users</Link>
+              <a href='/users' target="_blank">Users</a>
             </div>
             <div className="header__items-middle--item header-font">
-              <Link to='/invoices'>Invoices</Link>
+              <a href='/employee' target="_blank">Employee</a>
+            </div>
+            <div className="header__items-middle--item header-font">
+              <a href='/invoices' target="_blank">Invoices</a>
+            </div>
+            <div className="header__items-middle--item header-font">
+              <a href='/products' target="_blank">Products</a>
             </div>
           </div>
           <div className="header__items-right">
