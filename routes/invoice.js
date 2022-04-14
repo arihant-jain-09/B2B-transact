@@ -28,20 +28,23 @@ module.exports=(app)=>{
 
   app.patch('/invoices/:id',(req,res)=>{
     const invoice_id=req.params.id;
-    const {employee_id,grand_total,status}=req.body;
+    const {employee_id,seller_id,grand_total,status}=req.body;
     if(!employee_id || !grand_total) return res.send({'message':"please enter both employee_id and grand_total"})
       const check_invoice=`SELECT 1 FROM invoice WHERE invoice_id='${invoice_id}' LIMIT 1`;
 
     db.query(check_invoice,(err,results)=>{
       if(err) return res.send(err);
       else if(results && results.rowCount==1){
-        const check_employee=`SELECT 1 FROM employee WHERE employee_id='${employee_id}' LIMIT 1`;
+        const check_employee=`SELECT employee.employee_id,company.company_id from employee INNER JOIN company ON employee.company_id=company.company_id`;
         db.query(check_employee,(err,results)=>{
           if(err) return res.send(err);
           else if(results && results.rowCount==1){
-            updateInvoice(grand_total,invoice_id,status,function (message) {
-              return res.send(message);
-            })
+            if(results.rows[0].employee_id == employee_id && results.rows[0].company_id == seller_id)
+              updateInvoice(grand_total,invoice_id,status,function (message) {
+                return res.send(message);
+              })
+            else
+              res.send({"message":"employee must be of the seller company"})
           }
           else return res.send({"message":"please enter a valid employee id"});
         })
@@ -75,7 +78,6 @@ module.exports=(app)=>{
           db.query(check_employee),
           db.query(check_product),
         ]).then(([sender,receiver,employee,product])=>{
-            // return res.send({sender,receiver,employee})
           if(sender.rowCount==1 && receiver.rowCount==1 && employee.rowCount==1 && product.rowCount==1){
             db.query(`${ADD_INVOICE}('${buyer_id}','${seller_id}','${employee_id}','${product.rows[0].sku}','${grand_total}')`,(err,results)=>{
               if(err) return res.send(err);
@@ -88,26 +90,6 @@ module.exports=(app)=>{
               }})
             })
           }
-          // else if(sender.rowCount==1 && receiver.rowCount==1 && product.rowCount==1)
-          //   return res.send({"message":"please enter a valid employee id"})
-          // else if(sender.rowCount==1 && employee.rowCount==1 && product.rowCount==1)
-          //   return res.send({"message":"please enter a valid receiver id"})
-          // else if(sender.rowCount==1 && employee.rowCount==1 && receiver.rowCount==1)
-          //   return res.send({"message":"please enter a valid product id"})
-          // else if(sender.rowCount==1 && employee.rowCount==1 && receiver.rowCount==1)
-          //   return res.send({"message":"please enter a valid product id"})
-          // else if(sender.rowCount==1 && receiver.rowCount==1)
-          //   return res.send({"message":"please enter a valid employee id"})
-          // else if(sender.rowCount==1 && employee.rowCount==1)
-          //   return res.send({"message":"please enter a valid receiver company id"})
-          // else if(receiver.rowCount==1 && employee.rowCount==1)
-          //   return res.send({"message":"please enter a valid sender company id"})
-          // else if(sender.rowCount==1)
-          //   return res.send({"message":"please enter a valid receiver and employee id's"})
-          // else if(receiver.rowCount==1)
-          //   return res.send({"message":"please enter a valid sender and employee id's"})
-          // else if(employee.rowCount==1)
-          //   return res.send({"message":"please enter a valid sender and receiver id's"})
           else
             return res.send({"message":"please enter a valid sender, receiver, product and employee id's"})
         })
