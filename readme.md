@@ -16,6 +16,7 @@
 - [Installation](#installation)
 - [Links](#links)
 - [EndPoints](#EndPoints)
+- [Features](#Features)
 
 ## About
 
@@ -59,13 +60,16 @@ $ npm run dev
 
 #### - GET
 
-| Endpoint   | Info                                     |
-| ---------- | ---------------------------------------- |
-| /          | `Frontened on localhost:3000`            |
-| /users     | `List all the users`                     |
-| /companies | `List all the companies`                 |
-| /employee  | `List all the employee of the companies` |
-| /products  | `List all the products`                  |
+| Endpoint                         | Info                                     |
+| -------------------------------- | ---------------------------------------- |
+| /                                | `Frontened on localhost:3000`            |
+| /users                           | `List all the users`                     |
+| /companies                       | `List all the companies`                 |
+| /employee                        | `List all the employee of the companies` |
+| /invoices                        | `List all the invoices`                  |
+| /invoices/?sortBy=grand_total    | `Sort invoices by grand_total`           |
+| /invoices/?filter_status=pending | `Filter invoices by status`              |
+| /products                        | `List all the products`                  |
 
 #### - POST
 
@@ -87,3 +91,10 @@ $ npm run dev
 | /employee/id          | `email` `company_id`                             | Change email OR company_id or both.        |
 | /invoices/id          | `employee_id` `seller_id` `grand_total` `status` | Update if employee_id is of seller company |
 | /products/products/id | `item_name` `price` `currency`                   | SKU is fixed once declared.                |
+
+## Features
+
+- Invoices can be filtered based on grand_total or thier status.
+- Company can register user as its employee.
+- Separate Products table to keep track of all products.
+- Timestamp for all enteries.
