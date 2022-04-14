@@ -45,7 +45,6 @@ for launch server
 $ npm run dev
 ```
 
-
 ## Links
 
 - [SQL](https://tranzactsql.herokuapp.com/)
@@ -61,16 +60,23 @@ $ npm run dev
 
 #### - GET
 
-| Endpoint                         | Info                                     |
-| -------------------------------- | ---------------------------------------- |
-| /                                | `Frontened on localhost:3000`            |
-| /users                           | `List all the users`                     |
-| /companies                       | `List all the companies`                 |
-| /employee                        | `List all the employee of the companies` |
-| /invoices                        | `List all the invoices`                  |
-| /invoices/?sortBy=grand_total    | `Sort invoices by grand_total`           |
-| /invoices/?filter_status=pending | `Filter invoices by status`              |
-| /products                        | `List all the products`                  |
+| Endpoint                                                          | Info                                                                                                     |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| /                                                                 | `Frontened on localhost:3000`                                                                            |
+| /users                                                            | `List all the users`                                                                                     |
+| /companies                                                        | `List all the companies`                                                                                 |
+| /employee                                                         | `List all the employee of the companies`                                                                 |
+| /employee/invoice?employee_id=2                                   | `List all the invoices of an employee`                                                                   |
+| /employee/invoice?employee_id=2&count=3                           | `List all the invoices of an employee and limit results to 3`                                            |
+| /employee/invoice?employee_id=2&count=3&page=2                    | `List all the invoices of an employee, go to page 2 and limit results to 3`                              |
+| /employee/invoice?employee_id=2&count=3&page=2&status=pending     | `List all the invoices of an employee, go to page 2, filter by status of pending and limit results to 3` |
+| /invoices                                                         | `List all the invoices`                                                                                  |
+| /invoices?count=2                                                 | `List all the invoices with limit to 2`                                                                  |
+| /invoices?count=2&sortBy=grand_total                              | `List all the invoices , sort by grand_total and limit to 2`                                             |
+| /invoices?count=2&sortBy=grand_total&page=2                       | `List all the invoices , go to page 2, sort by grand_total and limit to 2`                               |
+| /invoices?count=2&sortBy=grand_total&page=2&filter_status=pending | `List all the invoices , go to page 2, sort by grand_total, filter by status of pending and limit to 2`  |
+| /invoices                                                         | `List all the invoices`                                                                                  |
+| /products                                                         | `List all the products`                                                                                  |
 
 #### - POST
 
