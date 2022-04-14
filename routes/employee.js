@@ -10,6 +10,7 @@ module.exports=(app)=>{
     })
   })
 
+
   const updateEmployee=(email,company_id,employee_id,callback)=>{
     let query;
     const updateAll=`UPDATE employee SET email = '${email}' , company_id = '${company_id}'WHERE employee_id = ${employee_id}`;

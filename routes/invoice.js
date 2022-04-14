@@ -1,4 +1,5 @@
 const GET="SELECT * FROM invoice";
+const GET_SORTED_BY_GRAND_TOTAL="SELECT * FROM invoice ORDER BY grand_total";
 // const INSERT_USER="INSERT INTO invoices(name,username) VALUES";
 const ADD_INVOICE="INSERT INTO invoice(buyer_id,seller_id,employee_id,products_services,grand_total ) VALUES";
 
@@ -55,10 +56,25 @@ module.exports=(app)=>{
   })
 
   app.get('/invoices',(req,res)=>{
-    db.query(GET,(err,results)=>{
-      if(err) res.send(err);
-      return res.send(results && results.rows);
-    })
+    const {sortBy,filter_status}=req.query;
+    if(sortBy && sortBy==='grand_total')
+      db.query(GET_SORTED_BY_GRAND_TOTAL,(err,results)=>{
+        if(err) return res.send(err)
+        return res.send(results && results.rows)
+      })
+    else if(filter_status && filter_status=='pending' || filter_status=='approved' || filter_status=='denied'){
+      const filer_query=`SELECT * FROM invoice WHERE status = '${filter_status}'`
+      db.query(filer_query,(err,results)=>{
+        if(err) return res.send(err)
+        return res.send(results && results.rows)
+      })
+    }
+    else{
+      db.query(GET,(err,results)=>{
+        if(err) res.send(err);
+        return res.send(results && results.rows);
+      })
+    }
   })
 
   app.post('/invoices',(req,res)=>{
