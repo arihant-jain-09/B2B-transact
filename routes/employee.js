@@ -1,6 +1,5 @@
 const GET="SELECT * FROM employee";
-// const INSERT_USER="INSERT INTO invoices(name,username) VALUES";
-// const INSERT_EMPLOYEE="INSERT INTO employee(user_id,company_id,email) VALUES";
+const INSERT_EMPLOYEE="INSERT INTO employee(user_id,company_id,email) VALUES";
 
 const db=require('../sql/connect');
 module.exports=(app)=>{
@@ -62,10 +61,48 @@ module.exports=(app)=>{
       })
   })
 
-  // app.post('/employee',(req,res)=>{
-  //   const {email,company_id}=req.body;
-  //   if(email && company_id){
+  const insertEmployee=(user_id,company_id,email,callback)=>{
+    const check_employee=`SELECT 1 FROM employee WHERE user_id='${user_id}' LIMIT 1`
+      db.query(check_employee,(err,results)=>{
+        if(err) return callback(err);
+        else if(results.rowCount==1)
+          return callback({"message":"employee already exists"})
+        else
+          db.query(`${INSERT_EMPLOYEE} ('${user_id}','${company_id}','${email}')`,(err,results)=>{
+          if(err) return callback(err)
+          return callback({"message":"Added employee"});
+        })
+      
+      })
+  }
 
-  //   }
-  // })
+  app.post('/employee',(req,res)=>{
+    const {email,company_id,user_id}=req.body;
+    if(email && company_id && user_id){
+      const check_company=`SELECT 1 FROM company WHERE company_id='${company_id}' LIMIT 1`
+      db.query(check_company,(err,results)=>{
+        if(err) res.send(err.message)
+        else if(results.rowCount==1){
+          insertEmployee(user_id,company_id,email,function (message) {
+           return res.send(message);
+          })
+        }
+        else res.send({"message":"please enter a valid company id"})
+      })
+    }
+    else if(email && company_id)
+      return res.send({"message":"please provide user_id"});
+    else if(company_id && user_id)
+      return res.send({"message":"please provide email"})
+    else if(email && user_id)
+      return res.send({"message":"please provide company_id"})
+    else if(email)
+      return res.send({"message":"please provide company_id and user_id"})
+    else if(company_id)
+      return res.send({"message":"please provide email and user_id"})
+    else if(user_id)
+      return res.send({"message":"please provide company_id and email"})
+    else 
+      return res.send({"message":"please provide company_id, user_id and email"})
+  })
 }

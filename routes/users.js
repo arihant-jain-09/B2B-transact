@@ -1,7 +1,6 @@
 const GET="SELECT * FROM users";
 const GET_INVOICES="SELECT invoice_id,grand_total,buyer_id,seller_id,status,created_at FROM invoice";
 const INSERT_USER="INSERT INTO users(name,username) VALUES";
-const INSERT_EMPLOYEE="INSERT INTO employee(user_id,company_id,email) VALUES";
 
 const db=require('../sql/connect');
 module.exports=(app)=>{
@@ -30,21 +29,6 @@ module.exports=(app)=>{
       }
       }
 
-    const insertEmployee=(user_id,company_id,email,callback)=>{
-      const check_employee=`SELECT 1 FROM employee WHERE user_id='${user_id}' LIMIT 1`
-        db.query(check_employee,(err,results)=>{
-          if(err) return callback(err);
-          else if(results.rowCount==1)
-            return callback({"message":"employee already exists"})
-          else
-            db.query(`${INSERT_EMPLOYEE} ('${user_id}','${company_id}','${email}')`,(err,results)=>{
-            if(err) return callback(err)
-            return callback({"message":"Added employee"});
-          })
-        
-        })
-    }
-
     app.patch('/users/:id',(req,res)=>{
       const {username,name,company_id,email}=req.body;
       const user_id=req.params.id;
@@ -58,17 +42,8 @@ module.exports=(app)=>{
         db.query(query,(err,results)=>{
           if(err) res.send(err.message)
           else if(results.rowCount==1){
-            const check_company=`SELECT 1 FROM company WHERE company_id='${company_id}' LIMIT 1`
-            db.query(check_company,(err,results)=>{
-              if(err) res.send(err.message)
-              else if(results.rowCount==1){
-                insertEmployee(user_id,company_id,email,function (employeeAddMessage) {
-                  updateUser(name,username,user_id,function(userMessage) {
-                    res.send({...userMessage,employeeAddMessage});
-                  })
-                })
-              }
-              else res.send({"message":"please enter a valid company id"})
+            updateUser(name,username,user_id,function(userMessage) {
+              res.send(userMessage);
             })
           }
           else res.send({"message":"please enter a valid user id"})
