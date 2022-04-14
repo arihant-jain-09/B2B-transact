@@ -104,4 +104,5 @@ $ npm run dev
 - Invoices can be filtered based on grand_total or thier status.
 - Company can register user as its employee.
 - Separate Products table to keep track of all products.
+- Pagination in /invoices and /employee/invoice and filteration based on query params
 - Timestamp for all enteries.
