@@ -56,25 +56,48 @@ module.exports=(app)=>{
   })
 
   app.get('/invoices',(req,res)=>{
-    const {sortBy,filter_status}=req.query;
-    if(sortBy && sortBy==='grand_total')
-      db.query(GET_SORTED_BY_GRAND_TOTAL,(err,results)=>{
-        if(err) return res.send(err)
-        return res.send(results && results.rows)
-      })
-    else if(filter_status && filter_status=='pending' || filter_status=='approved' || filter_status=='denied'){
-      const filer_query=`SELECT * FROM invoice WHERE status = '${filter_status}'`
-      db.query(filer_query,(err,results)=>{
-        if(err) return res.send(err)
-        return res.send(results && results.rows)
-      })
+    const {sortBy,filter_status,count,page}=req.query;
+    const DefaultLimit=5;
+    let query;
+    if(filter_status && (!filter_status=='pending' || !filter_status=='approved' || !filter_status=='denied'))
+      return res.send({"message":"enter a valid filter_status (pending,approved,denied)"})
+
+    else if(count && page && sortBy && filter_status)
+        query=`SELECT * FROM invoice WHERE status = '${filter_status}' ORDER BY ${sortBy} OFFSET ${count * page - count} LIMIT ${count}`;
+    
+    else if(count && page && sortBy){
+        query=`SELECT * FROM invoice ORDER BY ${sortBy} OFFSET ${count * page - count} LIMIT ${count}`;
     }
-    else{
-      db.query(GET,(err,results)=>{
-        if(err) res.send(err);
-        return res.send(results && results.rows);
-      })
+    else if(count && page && filter_status){
+        query=`SELECT * FROM invoice WHERE status = '${filter_status}' ORDER BY invoice_id OFFSET ${count * page - count} LIMIT ${count}`;
     }
+    else if(page && sortBy && filter_status){
+        query=`SELECT * FROM invoice WHERE status = '${filter_status}' ORDER BY ${sortBy} OFFSET ${DefaultLimit * page - DefaultLimit} LIMIT ${DefaultLimit}`;
+    }
+    else if(count && page){
+      query=`SELECT * FROM invoice ORDER BY invoice_id OFFSET ${count * page - count} LIMIT ${count}`;
+    }
+    else if(count && filter_status)
+      query=`SELECT * FROM invoice WHERE status = '${filter_status}' ORDER BY invoice_id LIMIT ${count}`;
+    
+    else if(page && filter_status)
+      query=`SELECT * FROM invoice WHERE status = '${filter_status}' ORDER BY invoice_id OFFSET ${DefaultLimit * page - DefaultLimit} LIMIT ${DefaultLimit}`;
+    
+    else if(filter_status)
+      query=`SELECT * FROM invoice WHERE status = '${filter_status}'`
+    else if(count)
+      query=`SELECT * FROM invoice LIMIT ${count}`
+    else if(page)
+      query=`SELECT * FROM invoice ORDER BY invoice_id OFFSET ${DefaultLimit * page - DefaultLimit} LIMIT ${DefaultLimit}`;
+    else 
+      query=`SELECT * FROM invoice`;
+
+        db.query(query,(err,results)=>{
+          if(err) return res.send(err);
+          else if(results && results.rows)
+              return res.send(results.rows);
+            
+        })
   })
 
   app.post('/invoices',(req,res)=>{

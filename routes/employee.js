@@ -3,6 +3,7 @@ const INSERT_EMPLOYEE="INSERT INTO employee(user_id,company_id,email) VALUES";
 
 const db=require('../sql/connect');
 module.exports=(app)=>{
+
   app.get('/employee',(req,res)=>{
     db.query(GET,(err,results)=>{
       if(err) return res.send(err);
@@ -10,6 +11,51 @@ module.exports=(app)=>{
     })
   })
 
+  app.get('/employee/invoice',(req,res)=>{
+    const {employee_id,page,count,type,sortBy}=req.query;
+    const DefaultLimit=5;
+    let query;
+    if(!employee_id) return res.send({"message":"please enter employee id"})
+
+    if(type && (!type=='buyer' || !type=='seller'))
+      return res.send({"message":"enter a valid type (buyer,seller)"});
+
+    else if(count && page && sortBy && type)
+        query=`SELECT * FROM invoice WHERE status = '${type}',employee_id = ${employee_id} ORDER BY ${sortBy} OFFSET ${count * page - count} LIMIT ${count}`;
+    
+    else if(count && page && sortBy){
+        query=`SELECT * FROM invoice WHERE employee_id = ${employee_id} ORDER BY ${sortBy} OFFSET ${count * page - count} LIMIT ${count}`;
+    }
+    else if(count && page && type){
+        query=`SELECT * FROM invoice WHERE status = '${type}',employee_id = ${employee_id} ORDER BY invoice_id OFFSET ${count * page - count} LIMIT ${count}`;
+    }
+    else if(page && sortBy && type){
+        query=`SELECT * FROM invoice WHERE status = '${type}',employee_id = ${employee_id} ORDER BY ${sortBy} OFFSET ${DefaultLimit * page - DefaultLimit} LIMIT ${DefaultLimit}`;
+    }
+    else if(count && page){
+      query=`SELECT * FROM invoice WHERE employee_id = ${employee_id} ORDER BY invoice_id OFFSET ${count * page - count} LIMIT ${count}`;
+    }
+    else if(count && type)
+      query=`SELECT * FROM invoice WHERE status = '${type}',employee_id = ${employee_id} ORDER BY invoice_id LIMIT ${count}`;
+    
+    else if(page && type)
+      query=`SELECT * FROM invoice WHERE status = '${type}',employee_id = ${employee_id} ORDER BY invoice_id OFFSET ${DefaultLimit * page - DefaultLimit} LIMIT ${DefaultLimit}`;
+    
+    else if(type)
+      query=`SELECT * FROM invoice WHERE status = '${type}',employee_id = ${employee_id}`
+    else if(count)
+      query=`SELECT * FROM invoice WHERE employee_id = ${employee_id} LIMIT ${count}`
+    else if(page)
+      query=`SELECT * FROM invoice WHERE employee_id = ${employee_id} ORDER BY invoice_id OFFSET ${DefaultLimit * page - DefaultLimit} LIMIT ${DefaultLimit}`;
+    else 
+      query=`SELECT * FROM invoice WHERE employee_id = ${employee_id}`;
+        db.query(query,(err,results)=>{
+          if(err) return res.send(err);
+          else if(results && results.rows)
+              return res.send(results.rows);
+            
+        })
+  })
 
   const updateEmployee=(email,company_id,employee_id,callback)=>{
     let query;
